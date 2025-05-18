@@ -13,10 +13,9 @@ class Window:
         
         self.__is_running = False
 
-        self.cell_width = width / 10
-        self.cell_height = height / 5
-
         self.cell_wall_color = cell_wall_color
+    
+        self.__root.protocol("WM_DELETE_WINDOW", self.close)
     
     def redraw(self):
         self.__root.update_idletasks()
@@ -30,8 +29,7 @@ class Window:
 
     def close(self):
         self.__is_running = False
-        self.__root.protocol("WM_DELETE_WINDOW", self.close)
-    
+        
     def draw_line(self, line:Line, fill_color:str):
         line.draw(self.__canvas, fill_color)
     
@@ -96,16 +94,18 @@ class Window:
       
 
         first_cell = Cell(win)
-        first_cell.draw(Point(left, top), curent_width, curent_height)
+        first_cell.draw(Point(left, top), curent_width, curent_height/2)
       
         second_cell = Cell(win)
-        second_cell.draw(Point(left + 0.75 * width, top + 0.75* height), curent_width / 2, curent_height/2)
+        second_cell.draw(Point(left + 0.75 * width, top + 0.75* height), curent_width / 2, -curent_height/2)
       
-        first_cell.draw_move(second_cell, undo)
+        second_cell.draw_move(first_cell, undo)
 
         
         win.wait_for_close()    
 
 if __name__ == '__main__':
+        Window.create_draw_some_lines_and_run_window(800,800)
+        Window.create_draw_some_cells_and_run_window(400, 800, 1, 2)
         Window.create_draw_move_and_run_window(800,800, cell_wall_color="green")
     
