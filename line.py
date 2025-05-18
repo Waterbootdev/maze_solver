@@ -6,7 +6,6 @@ class Line:
         self.second = second
 
     def draw(self, canvas:Canvas, fill_color:str):
-        print(self) 
         canvas.create_line(self.first.x, self.first.y, self.second.x, self.second.y, fill=fill_color, width=2)
 
     def __repr__(self) -> str:
