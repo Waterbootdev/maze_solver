@@ -50,8 +50,8 @@ class Window:
 
         top =  1
         left = 1
-        bottom = height
-        right = width
+        bottom = height + 1
+        right = width + 1
 
         win.draw_line(Line(Point(left, top), Point(right, bottom)), "red")
         win.draw_line(Line(Point(left, bottom),Point(right, top)), "green")
@@ -62,8 +62,6 @@ class Window:
         win.draw_line(Line(Point(left, top), Point(left, bottom)), "black")
         win.draw_line(Line(Point(right, top), Point(right, bottom)), "black")
         
-
-
         win.wait_for_close()    
 
     @staticmethod
@@ -73,8 +71,8 @@ class Window:
 
         top =  1
         left = 1
-        curent_height = height - 1
-        curent_width = width - 1
+        curent_height = height + 2 
+        curent_width = width + 2
 
         cell = Cell(win)
 
@@ -83,8 +81,31 @@ class Window:
 
         
         win.wait_for_close()    
+    
+    @staticmethod  
+    def create_draw_move_and_run_window(width:int, height:int, cell_wall_color="red", undo:bool=False):
+        
+        win = Window(width, height, cell_wall_color=cell_wall_color)
+
+        top =  1
+        left = 1
+        
+        curent_height = height/2
+        curent_width = width/2
+
+      
+
+        first_cell = Cell(win)
+        first_cell.draw(Point(left, top), curent_width, curent_height)
+      
+        second_cell = Cell(win)
+        second_cell.draw(Point(left + 0.75 * width, top + 0.75* height), curent_width / 2, curent_height/2)
+      
+        first_cell.draw_move(second_cell, undo)
+
+        
+        win.wait_for_close()    
 
 if __name__ == '__main__':
-    Window.create_draw_some_cells_and_run_window(800,800, 3, 3)
-
+        Window.create_draw_move_and_run_window(800,800, cell_wall_color="green")
     

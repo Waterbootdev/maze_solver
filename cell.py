@@ -40,29 +40,39 @@ class Cell:
         if self.has_left_wall:
             self.__window.draw_cell_wall(self.left_wall())
 
-
         
-    def left_wall(self):
+    def left_wall(self) -> Line:
         return Line(self.left_bottom(), self.left_top())
     
-    def right_wall(self):
+    def right_wall(self) -> Line:
         return Line(self.right_top(), self.right_bottom())
    
-    def top_wall(self):
+    def top_wall(self) -> Line:
         return Line(self.left_top(), self.right_top())
 
-    def bottom_wall(self):
+    def bottom_wall(self) -> Line:
         return Line(self.right_bottom(), self.left_bottom())
     
-    def left_top(self):
+    def left_top(self) -> Point:
         return Point(self.__left, self.__top)
 
-    def right_top(self):
+    def right_top(self) -> Point:
         return Point(self.__right, self.__top)
     
-    def left_bottom(self):
+    def left_bottom(self) -> Point:
         return Point(self.__left, self.__bottom)
 
-    def right_bottom(self):
+    def right_bottom(self) -> Point:
         return Point(self.__right, self.__bottom)
+    
+    def center_point(self) -> Point:
+        return self.left_top().mid_point(self.right_bottom())
+
+    @staticmethod
+    def color(gray:bool)-> str:
+        return "gray" if gray else "red" 
+
+    def draw_move(self, to_cell, undo=False):
+        self.__window.draw_line(Line(self.center_point(), to_cell.center_point()), Cell.color(undo))        
+        
     
