@@ -1,21 +1,29 @@
 from window import Window
 from point import Point
 from line import Line
+from wall import Wall
+from wall_index import WALLINDEX
+
+
 
 class Cell:
     def __init__(self, window = None) -> None:
-        
-        self.has_left_wall = True
-        self.has_right_wall = True
-        self.has_top_wall = True
-        self.has_bottom_wall = True
-        
+                
+        self.__walls = {}
+
+        self.__walls[WALLINDEX.TOP] = Wall(self.top_wall) 
+        self.__walls[WALLINDEX.RIGHT] = Wall(self.right_wall) 
+        self.__walls[WALLINDEX.BOTTOM] = Wall(self.bottom_wall) 
+        self.__walls[WALLINDEX.LEFT] = Wall(self.left_wall) 
+
         self.__left = -1
         self.__top = -1
         self.__right = -1
         self.__bottom = -1
 
         self.__window = window
+
+        self.visited = False
     
     def update_corners(self, left_top:Point, width:float, heigth:float):
         self.__left = left_top.x
@@ -38,21 +46,13 @@ class Cell:
             
             self.draw_walls(self.__window)
 
-
-    def draw_walls(self, win:Window):
-        #if self.has_top_wall:
-            win.draw_cell_wall(self.top_wall(), self.has_top_wall)
-
-        #if  self.has_right_wall:
-            win.draw_cell_wall(self.right_wall(), self.has_right_wall)
-
-        #if  self.has_bottom_wall:
-            win.draw_cell_wall(self.bottom_wall(), self.has_bottom_wall)
-        
-        #if  self.has_left_wall:
-            win.draw_cell_wall(self.left_wall(), self.has_left_wall)
-
-
+    def draw_wall(self, window:Window, wall:Wall):
+       window.draw_cell_wall(wall.line(), wall.visible)
+    
+    def draw_walls(self, window:Window):
+       for wall in self.__walls.values():
+           self.draw_wall(window, wall)
+       
     def left_wall(self) -> Line:
         return Line(self.left_bottom(), self.left_top())
     
@@ -87,5 +87,9 @@ class Cell:
     def draw_move(self, to_cell, undo=False):
         if isinstance(self.__window, Window):
             self.__window.draw_line(Line(self.center_point(), to_cell.center_point()), Cell.color(undo))        
+
+    def wall(self, wall_index:WALLINDEX) -> Wall:
+        return self.__walls[wall_index]
         
+ 
     

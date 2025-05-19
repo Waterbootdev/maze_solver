@@ -1,7 +1,9 @@
 from time import sleep
 from window import Window
-from cell import Cell
+from cell import Cell, WALLINDEX
 from point import Point
+import random
+
 class Maze:
     def __init__(
         self,
@@ -12,6 +14,7 @@ class Maze:
         cell_size_x : float,
         cell_size_y : float,
         win = None,
+        seed=None,
     ) -> None:
         self.x1 = x1
         self.y1 = y1
@@ -20,6 +23,14 @@ class Maze:
         self.cell_size_x=cell_size_x
         self.cell_size_y=cell_size_y
         self.win = win
+
+        if seed is not None:
+            random.seed(seed)
+
+        self.create_and_daw(num_cols, num_rows, win)
+
+
+    def create_and_daw(self, num_cols, num_rows, win):
         self.__cells = Maze.__create_cells(win, num_cols, num_rows)
 
 
@@ -49,8 +60,8 @@ class Maze:
             sleep(0.0005)
         
     def __break_entrance_and_exit(self):
-        self.entrance().has_top_wall = False 
-        self.exit().has_bottom_wall = False
+        self.entrance().wall(WALLINDEX.TOP).visible = False 
+        self.exit().wall(WALLINDEX.BOTTOM).visible = False
         self.entrance().redraw()
         self.exit().redraw()
  
@@ -60,5 +71,8 @@ class Maze:
 
     def entrance(self) -> Cell:
         return self.__cells[0][0]
+    
+    def __break_walls_r(self, x:int, y:int) -> None:
+        pass
 
 
