@@ -1,9 +1,9 @@
-#from window import Window
+from window import Window
 from point import Point
 from line import Line
 
 class Cell:
-    def __init__(self, window) -> None:
+    def __init__(self, window = None) -> None:
         
         self.has_left_wall = True
         self.has_right_wall = True
@@ -28,19 +28,31 @@ class Cell:
 
         self.update_corners(left_top, width, heigth)
 
-        if self.has_top_wall:
-            self.__window.draw_cell_wall(self.top_wall())
+        if isinstance(self.__window, Window):
+            
+            self.draw_walls(self.__window)
 
-        if self.has_right_wall:
-            self.__window.draw_cell_wall(self.right_wall())
+    def redraw(self):
 
-        if self.has_bottom_wall:
-            self.__window.draw_cell_wall(self.bottom_wall())
+        if isinstance(self.__window, Window):
+            
+            self.draw_walls(self.__window)
+
+
+    def draw_walls(self, win:Window):
+        #if self.has_top_wall:
+            win.draw_cell_wall(self.top_wall(), self.has_top_wall)
+
+        #if  self.has_right_wall:
+            win.draw_cell_wall(self.right_wall(), self.has_right_wall)
+
+        #if  self.has_bottom_wall:
+            win.draw_cell_wall(self.bottom_wall(), self.has_bottom_wall)
         
-        if self.has_left_wall:
-            self.__window.draw_cell_wall(self.left_wall())
+        #if  self.has_left_wall:
+            win.draw_cell_wall(self.left_wall(), self.has_left_wall)
 
-        
+
     def left_wall(self) -> Line:
         return Line(self.left_bottom(), self.left_top())
     
@@ -73,6 +85,7 @@ class Cell:
         return "gray" if gray else "red" 
 
     def draw_move(self, to_cell, undo=False):
-        self.__window.draw_line(Line(self.center_point(), to_cell.center_point()), Cell.color(undo))        
+        if isinstance(self.__window, Window):
+            self.__window.draw_line(Line(self.center_point(), to_cell.center_point()), Cell.color(undo))        
         
     
