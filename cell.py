@@ -11,10 +11,10 @@ class Cell:
                 
         self.__walls = {}
 
-        self.__walls[WALLINDEX.TOP] = Wall(self.top_wall) 
-        self.__walls[WALLINDEX.RIGHT] = Wall(self.right_wall) 
-        self.__walls[WALLINDEX.BOTTOM] = Wall(self.bottom_wall) 
-        self.__walls[WALLINDEX.LEFT] = Wall(self.left_wall) 
+        self.__walls[WALLINDEX.TOP] = Wall(WALLINDEX.TOP, self.top_wall) 
+        self.__walls[WALLINDEX.RIGHT] = Wall(WALLINDEX.RIGHT, self.right_wall) 
+        self.__walls[WALLINDEX.BOTTOM] = Wall(WALLINDEX.BOTTOM, self.bottom_wall) 
+        self.__walls[WALLINDEX.LEFT] = Wall(WALLINDEX.LEFT, self.left_wall) 
 
         self.__left = -1
         self.__top = -1
@@ -23,7 +23,8 @@ class Cell:
 
         self.__window = window
 
-        self.visited = False
+        self.entrans_visited = False
+        self.exit_visited = False
     
     def update_corners(self, left_top:Point, width:float, heigth:float):
         self.__left = left_top.x
@@ -45,6 +46,8 @@ class Cell:
         if isinstance(self.__window, Window):
             
             self.draw_walls(self.__window)
+            self.__window.redraw()
+    
 
     def draw_wall(self, window:Window, wall:Wall):
        window.draw_cell_wall(wall.line(), wall.visible)
@@ -90,6 +93,20 @@ class Cell:
 
     def wall(self, wall_index:WALLINDEX) -> Wall:
         return self.__walls[wall_index]
-        
+            
+    def visible_walls(self) -> list[Wall]:
+        return [wall for wall in self.__walls.values() if wall.visible] 
+
+    def set_invisible(self, wall_index:WALLINDEX) -> None:
+         self.__walls[wall_index].visible = False   
  
+    def reset_visited(self) -> None:
+        self.entrans_visited = False
+        self.exit_visited = False
     
+    def reset_wals(self) -> None:
+        for wall in self.__walls.values():
+            wall.visible = True
+
+
+

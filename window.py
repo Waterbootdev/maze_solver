@@ -3,7 +3,7 @@ from line import Line
 
 
 class Window:
-    def __init__(self, width:int, height:int, visible_cell_wall_color:str = "black", invisible_cell_wall_color:str = "pink") -> None:
+    def __init__(self, width:int, height:int, visible_cell_wall_color:str = "black", invisible_cell_wall_color:str = "#d9d9d9") -> None:
         self.__root = Tk()
         self.__root.title("maze_solver")
         
