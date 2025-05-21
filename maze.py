@@ -32,15 +32,94 @@ class Maze:
 
         self.create_and_draw(num_cols, num_rows, win)
 
-        entrance_path = MazePath(self.entrance_positon(), self.set_entrance_visited, self.entrance_visited, self.exit_visited)
-        exit_path = MazePath(self.exit_positon(), self.set_exit_visited, self.exit_visited, self.entrance_visited)
+        self.create_maze_paths()
+
+        self.reduce_visible_walls()            
+
+        self.reset_visited(self.__cells)
+
+        path = self.search_path()
+
+        print(path.length)
+
+    def search_path(self) -> MazePath:
+        entrance_path = MazePath(self.entrance_positon(), self.set_entrance_visited, self.set_entrance_invisited, self.entrance_visited, self.exit_visited)
+        self.search_path_r(entrance_path, self.cell(entrance_path._position), self.exit_positon())
+        return entrance_path
+        
+    def search_path_r(self, path:MazePath, cell:Cell, exit_position):
+            neigbor_positions = self.neighbors(cell, path)
+
+            if len(neigbor_positions) > 0:
+                
+                if exit_position in neigbor_positions:
+                    path.append(exit_position)
+                    cell.draw_move(self.cell(exit_position))
+                    return True
+                else:
+                    for position in neigbor_positions:
+                        path.append(position)
+                        neighbor = self.cell(position)
+                        path._set_visited(position)
+                        self.draw_move(cell, neighbor)
+                        if self.search_path_r(path, neighbor ,exit_position):
+                            return True
+                        else:
+                            path.step_back()
+                            path._set_invisited(position)
+                            self.draw_move_back(neighbor, cell)
+            else:
+                return False
+
+    def draw_move(self, cell:Cell, neighbor:Cell):
+        cell.draw_move(neighbor)
+        self.redraw()
+    
+    def draw_move_back(self, cell:Cell, neighbor:Cell):
+        cell.draw_move(neighbor, undo=True)
+        self.redraw()
+
+    def neighbors(self, cell:Cell, path:MazePath) -> list[Position]:
+        return [wall._neighbor for wall in cell.invisible_walls() if wall._neighbor and not path._is_visited(wall._neighbor)]
+    
+    def create_maze_paths(self):
+        entrance_path = MazePath(self.entrance_positon(), self.set_entrance_visited, self.set_entrance_invisited, self.entrance_visited, self.exit_visited)
+        exit_path = MazePath(self.exit_positon(), self.set_exit_visited, self.set_exit_invisited, self.exit_visited, self.entrance_visited)
 
         while not self.connect(entrance_path, exit_path):
             Maze.reset(self.__cells)
             self.__break_entrance_and_exit()
 
-        self.reset_visited(self.__cells)
+    def reduce_visible_walls(self):
+        visited, unvisited = Maze.group_cells(self.__cells)
+
+        for cell in unvisited:
+            for wal in [wall for wall in cell.visible_walls() if wall._neighbor and self.cell(wall._neighbor).unvisited()]:
+                wal.visible = False
+            cell.redraw(redraw_window=False)
+  
+        for cell in visited:
+            cell.redraw(redraw_window=False)
+
+        self.redraw()
+
+    def redraw(self):
+        if self.win: 
+            self.win.redraw()
         
+    @staticmethod
+    def group_cells(cols:list[list[Cell]])-> tuple[list[Cell], list[Cell]]:
+        unvisited = []
+        visited=[]
+        for col in cols:
+            for cell in col:
+                if cell.unvisited():
+                    unvisited.append(cell)
+                else:
+                    visited.append(cell)
+        
+        return visited, unvisited
+
     @staticmethod
     def reset(cols:list[list[Cell]]) -> None:
         for col in cols:
@@ -148,13 +227,7 @@ class Maze:
      
     def __draw_cell(self, cell:Cell, x:int, y:int) -> None:
         cell.draw(Point(self.x1 + x * self.cell_size_x, self.y1 + y * self.cell_size_y), self.cell_size_x, self.cell_size_y)
-        self._animate() 
         
-    def _animate(self) -> None:
-        if isinstance(self.win, Window): 
-            self.win.redraw()
-            if self.sleep_animated: 
-                sleep(0.0005)
         
     def __break_entrance_and_exit(self):
         self.entrance().wall(WALLINDEX.TOP).visible = False 
@@ -162,7 +235,6 @@ class Maze:
         self.entrance().redraw()
         self.exit().redraw()
  
-
     def exit(self) -> Cell:
         return self.__cells[-1][-1]
 
@@ -186,6 +258,11 @@ class Maze:
             self.cell(position).entrans_visited = True
         else:
             raise Exception()
+    def set_entrance_invisited(self, position:Position|None) -> None:
+        if position:
+            self.cell(position).entrans_visited = False
+        else:
+            raise Exception()
     
     def set_exit_visited(self, position:Position|None) -> None:
         if position:
@@ -193,6 +270,11 @@ class Maze:
         else:
             raise Exception()
     
+    def set_exit_invisited(self, position:Position|None) -> None:
+        if position:
+            self.cell(position).exit_visited = False
+        else:
+            raise Exception()
     
     def cell(self, position:Position|None)-> Cell:
         if position:

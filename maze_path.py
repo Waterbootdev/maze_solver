@@ -6,11 +6,13 @@ Position = namedtuple('Position', ['x', 'y'])
 class MazePath:
     def __init__(self, start: Position, 
                  set_visited:Callable[[Position|None], None], 
+                 set_invisited:Callable[[Position|None], None], 
                  is_visited:Callable[[Position],bool], 
                  is_other_visited:Callable[[Position], bool],
                 ) -> None:
        
         self._set_visited = set_visited
+        self._set_invisited = set_invisited
         self._is_visited = is_visited
         self._is_other_visited = is_other_visited
         self._position = start

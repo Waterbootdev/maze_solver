@@ -41,19 +41,34 @@ class Cell:
             
             self.draw_walls(self.__window)
 
-    def redraw(self):
+    def redraw(self, redraw_window:bool=True):
 
         if isinstance(self.__window, Window):
             
             self.draw_walls(self.__window)
-            self.__window.redraw()
+            if redraw_window:
+                self.__window.redraw()
     
 
     def draw_wall(self, window:Window, wall:Wall):
        window.draw_cell_wall(wall.line(), wall.visible)
     
+    def group_walls(self):
+        visible =[]
+        unvisible =[]
+        for wall in self.__walls.values():
+            if wall.visible:
+                visible.append(wall)
+            else:
+                unvisible.append(wall)
+        return visible, unvisible
+        
+
     def draw_walls(self, window:Window):
-       for wall in self.__walls.values():
+        visible, unvisible = self.group_walls()
+        for wall in unvisible:
+           self.draw_wall(window, wall)
+        for wall in visible:
            self.draw_wall(window, wall)
        
     def left_wall(self) -> Line:
@@ -96,6 +111,8 @@ class Cell:
             
     def visible_walls(self) -> list[Wall]:
         return [wall for wall in self.__walls.values() if wall.visible] 
+    def invisible_walls(self) -> list[Wall]:
+        return [wall for wall in self.__walls.values()  if not wall.visible] 
 
     def set_invisible(self, wall_index:WALLINDEX) -> None:
          self.__walls[wall_index].visible = False   
@@ -107,6 +124,9 @@ class Cell:
     def reset_wals(self) -> None:
         for wall in self.__walls.values():
             wall.visible = True
+
+    def unvisited(self):
+        return not self.entrans_visited and not self.exit_visited
 
 
 
